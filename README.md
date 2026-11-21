@@ -12,7 +12,7 @@
 
 **Make dangerous players known. Give hunters a reason to pursue them.**
 
-[Download latest build](https://github.com/OPxnihal/APERION-SMP-/actions) · [Report a bug](https://github.com/OPxnihal/APERION-SMP-/issues) · [Source code](AperionWanted-1.0.0-source/aperion-wanted/)
+[Latest release](https://github.com/OPxnihal/APERION-SMP-/releases/latest) · [Report a bug](https://github.com/OPxnihal/APERION-SMP-/issues) · [Source code](AperionWanted-1.0.0-source/aperion-wanted/)
 
 </div>
 
@@ -62,15 +62,6 @@ Ranks and score values can be changed in `config.yml`.
 - No mandatory Vault, EssentialsX, BetterTeams, Skript or economy plugin integration.
 
 Use the build produced by this repository's GitHub Actions workflow. A successful compile confirms that the source builds; it does not replace testing on a staging server.
-
-## Download
-
-1. Open [GitHub Actions](https://github.com/OPxnihal/APERION-SMP-/actions).
-2. Select the latest successful **Build APERION Wanted** run.
-3. Scroll to **Artifacts** and download `APERION-Wanted-1.0.0`.
-4. Extract the downloaded ZIP. The plugin JAR is inside it.
-
-The JAR is a workflow artifact, so it does **not** appear in the repository's normal Code file list. Keep in mind that GitHub Actions artifacts expire according to GitHub's retention settings.
 
 ## Installation
 
