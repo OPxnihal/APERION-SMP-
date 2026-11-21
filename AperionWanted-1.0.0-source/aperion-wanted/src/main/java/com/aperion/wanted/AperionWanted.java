@@ -73,6 +73,7 @@ public final class AperionWanted extends JavaPlugin implements Listener, Command
     }
 
     private void detectNearby() {
+        refreshTabNames();
         if (!enabled()) return;
         double radius = Math.max(1, getConfig().getDouble("system.detection-radius", 48));
         double r2 = radius * radius;
@@ -93,7 +94,32 @@ public final class AperionWanted extends JavaPlugin implements Listener, Command
                 observer.sendTitle(color(title), color(sub), 5, 55, 10);
                 String chat = getConfig().getString("system.alert-chat", "&cMOST WANTED DETECTED: {player}").replace("{player}", wanted.getName()).replace("{distance}", String.valueOf(distance));
                 observer.sendMessage(color(chat));
-                try { observer.playSound(observer.getLocation(), Sound.valueOf(getConfig().getString("system.alert-sound", "ENTITY_ELDER_GUARDIAN_CURSE")), 1.0f, 0.7f); } catch (IllegalArgumentException ignored) {}
+                playAlertSound(observer);
+                Map<UUID, Long> targetSeen = alertTimes.computeIfAbsent(wanted.getUniqueId(), k -> new ConcurrentHashMap<>());
+                if (now - targetSeen.getOrDefault(observer.getUniqueId(), 0L) >= cooldown) {
+                    targetSeen.put(observer.getUniqueId(), now);
+                    wanted.sendTitle(color(getConfig().getString("system.target-alert-title", "&cBOUNTY HUNTER NEARBY")), color(getConfig().getString("system.target-alert-subtitle", "&eA player has entered your detection range.")), 5, 55, 10);
+                    wanted.sendMessage(color(getConfig().getString("system.target-alert-chat", "&cWARNING: &eA bounty hunter is nearby!")));
+                    playAlertSound(wanted);
+                }
+            }
+        }
+    }
+
+    private void playAlertSound(Player player) {
+        try { player.playSound(player.getLocation(), Sound.valueOf(getConfig().getString("system.alert-sound", "ENTITY_ELDER_GUARDIAN_CURSE")), 1.0f, 0.7f); } catch (IllegalArgumentException ignored) {}
+    }
+
+    private void refreshTabNames() {
+        if (!getConfig().getBoolean("tab-list.enabled", true)) return;
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerRecord r = record(player);
+            String rankName = rank(r.score);
+            if (r.score <= 0 || rankName.equalsIgnoreCase("Unknown")) {
+                player.setPlayerListName(color(getConfig().getString("tab-list.normal-format", "&f{player}").replace("{player}", player.getName())));
+            } else {
+                String format = getConfig().getString("tab-list.wanted-format", "&c⚠ &f{player} &8[&c{rank}&8]");
+                player.setPlayerListName(color(format.replace("{player}", player.getName()).replace("{rank}", rankName.toUpperCase(Locale.ROOT))));
             }
         }
     }
@@ -109,6 +135,7 @@ public final class AperionWanted extends JavaPlugin implements Listener, Command
         int bonus = Math.min(getConfig().getInt("wanted.streak-bonus-cap", 50), Math.max(0, kr.streak - 1) * getConfig().getInt("wanted.streak-bonus-per-kill", 5));
         kr.score = Math.max(0, kr.score + base + bonus);
         save(kr);
+        refreshTabNames();
         killer.sendMessage(color("&8[&cWanted&8] &7PvP kill recorded. &c+" + (base + bonus) + " Wanted &8| &f" + rank(kr.score) + " &8| &7Streak: &f" + kr.streak));
         payBounty(killer, victim, vr);
     }
@@ -117,12 +144,20 @@ public final class AperionWanted extends JavaPlugin implements Listener, Command
         long cooldown = getConfig().getLong("bounty.same-pair-cooldown-hours", 24) * 3_600_000L;
         try {
             if (!store.mayClaim(killer.getUniqueId(), victim.getUniqueId(), cooldown)) return;
-            String reward = getConfig().getString("bounty.rewards." + rank(target.score));
+            List<String> pool = getConfig().getStringList("bounty.rewards." + rank(target.score));
             int totalItems = 0;
-            if (reward != null && !reward.isBlank()) {
+            if (!pool.isEmpty()) {
+                String reward = pool.get(new Random().nextInt(pool.size()));
                 String[] parts = reward.split(":");
                 Material material = Material.matchMaterial(parts[0]);
-                int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
+                int amount = 1;
+                if (parts.length > 1) {
+                    String[] range = parts[1].split("-");
+                    int min = Integer.parseInt(range[0]);
+                    int max = range.length > 1 ? Integer.parseInt(range[1]) : min;
+                    if (min < 1 || max < min) throw new IllegalArgumentException("Invalid reward amount: " + reward);
+                    amount = min + new Random().nextInt(max - min + 1);
+                }
                 if (material == null || amount <= 0) { getLogger().warning("Invalid bounty reward: " + reward); return; }
                 giveItem(killer, material, amount); totalItems += amount;
             }
@@ -169,7 +204,7 @@ public final class AperionWanted extends JavaPlugin implements Listener, Command
                 case "reset" -> {
                     if (args.length < 2) { sender.sendMessage("/wanted reset <player>"); return true; }
                     Player target = Bukkit.getPlayerExact(args[1]); if (target == null) { sender.sendMessage(msg("player-not-found")); return true; }
-                    PlayerRecord r = record(target); r.score = 0; r.streak = 0; r.kills = 0; save(r); sender.sendMessage(color("&aReset Wanted stats for " + target.getName()));
+                    PlayerRecord r = record(target); r.score = 0; r.streak = 0; r.kills = 0; save(r); refreshTabNames(); sender.sendMessage(color("&aReset Wanted stats for " + target.getName()));
                 }
             }
             return true;
