@@ -1,71 +1,52 @@
-# APERION Wanted 1.0.0
+# APERION Wanted 1.0.0 — Source Project
 
-A standalone Paper plugin project for wanted scores, kill streaks, proximity alerts, short-lived compass tracking, and configurable item bounties. It uses UUID keys and SQLite persistence. Geyser/Floodgate are not required dependencies: Bedrock players appear to Paper as normal online players, so the core mechanics work for them too.
+This folder contains the Gradle source project for the **APERION SMP Wanted & Bounty Hunter** Paper plugin.
 
-## Compatibility target
+For the public-facing overview, feature list, commands, permissions, installation guide, configuration notes, limitations and test checklist, see the [repository README](../../../README.md).
 
-- Minecraft/Paper API: 26.3 (`26.3-R0.1-SNAPSHOT`)
-- Java toolchain/runtime: 25
-- No required Vault, Geyser, Floodgate, Skript, BetterTeams, or economy dependency.
-- SQLite JDBC is shaded into the plugin JAR.
+## Build target
 
-The source project was prepared for this target, but **a compiled JAR has not been produced or tested in this environment**: this build environment only has JDK 21 and no network access to retrieve the Paper 26.3 API or JDK 25. Do not upload the source ZIP to `plugins/`; build the JAR first using the steps below.
+- Minecraft / Paper API: 26.3
+- Java toolchain and runtime: 25
+- Gradle: 9.x
+- SQLite JDBC is bundled into the shaded plugin JAR.
+- Geyser and Floodgate are optional; neither is a hard dependency.
 
-## Build on a Java 25 computer
+## Build locally
 
-1. Install a JDK 25 distribution and Gradle 9.1 or newer.
-2. Open a terminal in this project folder.
-3. Run `gradle clean build`.
-4. The installable shaded JAR should be created at `build/libs/AperionWanted-1.0.0.jar`.
-5. Check the build output for errors before installing.
+From this directory, with JDK 25 and Gradle 9 installed:
 
-Paper's Maven repository must be reachable during the first build. The project downloads Paper API and SQLite JDBC automatically.
+```bash
+gradle clean build
+```
+
+The shaded plugin JAR is produced in:
+
+```
+build/libs/AperionWanted-1.0.0.jar
+```
+
+The GitHub Actions workflow at the repository root builds this project automatically on pushes affecting this source folder and can also be run manually from the Actions tab.
 
 ## Install
 
-1. Stop the Paper server and make a backup.
-2. Upload `AperionWanted-1.0.0.jar` to the server's `plugins/` directory.
-3. Start the server once, then stop it.
-4. Edit `plugins/AperionWanted/config.yml` as desired.
-5. Start the server and run `/plugins` and `/wanted` to check it loaded.
-6. SQLite data is stored at `plugins/AperionWanted/wanted.sqlite`.
+1. Back up the Paper server and stop it.
+2. Copy `AperionWanted-1.0.0.jar` into `plugins/`.
+3. Start the server once to generate the plugin folder.
+4. Edit `plugins/AperionWanted/config.yml`.
+5. Restart and verify with `/plugins` and `/wanted`.
 
-## Commands
+Player records are stored in `plugins/AperionWanted/wanted.sqlite`.
 
-- `/wanted` — your own statistics.
-- `/wanted <online-player>` — inspect an online player.
-- `/wanted top` — online top list.
-- `/track <online-player>` — acquire a wanted target temporarily.
-- `/bounty <online-player>` — view wanted rank and bounty amount.
-- `/bounty set <online-player> <amount>` — admin-set extra bounty item count.
-- `/bounty remove <online-player>` — clear the extra bounty.
-- `/wanted reset <online-player>` — reset score, kills and streak.
-- `/wanted reload|enable|disable` — admin controls.
+## Current implementation notes
 
-Permissions: `aperionwanted.admin` (op), `aperionwanted.check` (true), `aperionwanted.track` (true).
+- PvP kills add Wanted score and streak bonuses; death resets the victim's streak.
+- Proximity alerts use a title, chat warning and Elder Guardian sound. A live 3D player head is not embedded in the title.
+- Tracking is temporary, same-world, range-limited and can require line of sight; no coordinates are shown.
+- Bounty rewards are vanilla items, not Vault currency.
+- Repeat bounty claims are limited by a configurable killer/target pair cooldown.
+- BetterTeams team detection is not implemented in this version; its config flag is reserved for a future adapter.
+- Player-funded bounty placement and offline target administration are not included.
+- Geyser/Floodgate are not required dependencies. Test Bedrock behaviour on your own server before production use.
 
-## Mechanics and known limits
-
-- A PvP kill increases kills, streak and score. A death resets the victim's streak.
-- Streak bonus is added to the base score and capped by config.
-- Detection is server-side, same-world only, and uses per-observer/per-target cooldowns. The alert is a title, chat warning and Elder Guardian sound. Minecraft's normal title/chat APIs cannot embed a live 3D player head in the notification; no fake head is shown.
-- Tracking is temporary, same-world, distance-limited, and stops if line of sight is lost. It updates the player's compass target; it does not print coordinates.
-- Rewards are vanilla items. The rank reward is configured by rank name. `/bounty set` adds that many `custom-bounty-material` items when the target is killed. A killer/target pair can claim again after the configured cooldown.
-- The `bounty.block-same-team` option is reserved for a future team-plugin adapter; this build does not introspect BetterTeams teams. Keep it false and use the pair cooldown.
-- Admin bounty commands currently require the target to be online. Player-funded/self-service bounty placement and offline admin lookup are not implemented in this initial build.
-- No interaction with Skript, exile, datapacks, world generation, Chunky, spawn, or teleport plugins is intentionally registered.
-
-## Test checklist
-
-1. Start server and confirm `AperionWanted` appears in `/plugins`.
-2. Join with two test accounts. Kill one with the other; check `/wanted` for the killer and victim.
-3. Kill again and confirm streak bonus increases; have the killer die and confirm streak returns to zero.
-4. Temporarily set `alert-minimum-score: 1` and `detection-radius: 48`; move the test players together and confirm title, sound and chat warning. Restore the desired threshold afterward.
-5. Use `/track <player>` while in clear line of sight. Confirm compass updates; move behind a wall and confirm tracking ends.
-6. Set a bounty with `/bounty set <target> 2`; eliminate the target and confirm rank reward plus two configured custom bounty items. Repeat the same pair before cooldown and confirm no second payout.
-7. Restart server and confirm records persist.
-8. Repeat with one Bedrock account through Geyser/Floodgate.
-
-## Important pre-release note
-
-This is an initial source implementation, not a verified release binary. Compile against the exact Paper API used by the server, resolve any API changes reported by the compiler, and test on a staging copy before production use. In particular, verify the configured Paper API snapshot exists in the Paper Maven repository at build time.
+Always test on a staging server before installing on a live world. A successful build is not a substitute for in-game feature testing.
