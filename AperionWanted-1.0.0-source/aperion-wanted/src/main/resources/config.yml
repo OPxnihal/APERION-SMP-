@@ -1,0 +1,55 @@
+system:
+  enabled: true
+  # How often nearby-player detection runs. 20 ticks = 1 second.
+  detection-interval-ticks: 20
+  detection-radius: 48
+  alert-cooldown-seconds: 45
+  # Only players at or above this score trigger proximity alerts.
+  alert-minimum-score: 1000
+  alert-title: "&4MOST WANTED PLAYER DETECTED"
+  alert-subtitle: "&cA dangerous player is nearby: &f{player}"
+  alert-chat: "&c⚠ &4MOST WANTED DETECTED &c⚠ &f{player} &7is within {distance} blocks!"
+  alert-sound: ENTITY_ELDER_GUARDIAN_CURSE
+
+wanted:
+  kill-score: 25
+  streak-bonus-per-kill: 5
+  streak-bonus-cap: 50
+  ranks:
+    - { name: "Unknown", minimum: 0 }
+    - { name: "Notorious", minimum: 100 }
+    - { name: "Wanted", minimum: 250 }
+    - { name: "Dangerous", minimum: 500 }
+    - { name: "Outlaw", minimum: 1000 }
+    - { name: "Most Wanted", minimum: 2000 }
+
+tracking:
+  enabled: true
+  maximum-distance: 256
+  duration-seconds: 60
+  update-interval-ticks: 20
+  require-line-of-sight: true
+  message: "&eTracking &f{player}&e: approximately &6{distance} blocks &ein the direction of your compass."
+  expired-message: "&7Your wanted-player tracking has expired or lost line of sight."
+
+bounty:
+  # Rewards are delivered as vanilla items; no economy plugin is required.
+  rewards:
+    Unknown: "GOLD_INGOT:2"
+    Notorious: "GOLD_INGOT:5"
+    Wanted: "GOLD_INGOT:10"
+    Dangerous: "GOLD_INGOT:20"
+    Outlaw: "GOLD_INGOT:32"
+    Most Wanted: "GOLD_INGOT:48"
+  same-pair-cooldown-hours: 24
+  # Prevent farming between players on the same BetterTeams team only if an integration is added later.
+  block-same-team: false
+
+messages:
+  prefix: "&8[&cAPERION&8] &r"
+  no-permission: "&cYou don't have permission."
+  player-only: "&cThis command can only be used by a player."
+  player-not-found: "&cThat player must be online."
+  disabled: "&cThe Wanted system is currently disabled."
+  # /bounty set <player> <amount> adds this many items on top of the rank reward.
+  custom-bounty-material: DIAMOND

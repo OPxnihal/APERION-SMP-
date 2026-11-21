@@ -1,0 +1,24 @@
+name: AperionWanted
+version: 1.0.0
+main: com.aperion.wanted.AperionWanted
+api-version: '26.3'
+author: APERION SMP
+description: Wanted ranks, proximity alerts, temporary tracking and bounty rewards.
+commands:
+  wanted:
+    description: View Wanted status or manage the system.
+    usage: /wanted [player|top|reload|enable|disable|reset <player>]
+    aliases: [w]
+  bounty:
+    description: Manage a player's bounty.
+    usage: /bounty <player> | /bounty set <player> <amount> | /bounty remove <player>
+  track:
+    description: Temporarily track a visible wanted player in your world.
+    usage: /track <player>
+permissions:
+  aperionwanted.admin:
+    default: op
+  aperionwanted.track:
+    default: true
+  aperionwanted.check:
+    default: true
