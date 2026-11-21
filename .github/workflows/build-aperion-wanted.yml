@@ -5,10 +5,13 @@ on:
     paths:
       - "AperionWanted-1.0.0-source/aperion-wanted/**"
       - ".github/workflows/build-aperion-wanted.yml"
+  push_tags:
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -41,3 +44,11 @@ jobs:
           name: APERION-Wanted-1.0.0
           path: AperionWanted-1.0.0-source/aperion-wanted/build/libs/*.jar
           if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: APERION Wanted ${{ github.ref_name }}
+          generate_release_notes: true
+          files: AperionWanted-1.0.0-source/aperion-wanted/build/libs/*.jar
