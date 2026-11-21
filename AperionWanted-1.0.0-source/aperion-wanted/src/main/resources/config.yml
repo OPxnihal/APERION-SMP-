@@ -4,8 +4,8 @@ system:
   detection-interval-ticks: 20
   detection-radius: 48
   alert-cooldown-seconds: 45
-  # Only players at or above this score trigger proximity alerts.
-  alert-minimum-score: 1000
+  # Notorious and higher players trigger proximity alerts.
+  alert-minimum-score: 100
   alert-title: "&4MOST WANTED PLAYER DETECTED"
   alert-subtitle: "&cA dangerous player is nearby: &f{player}"
   alert-chat: "&c⚠ &4MOST WANTED DETECTED &c⚠ &f{player} &7is within {distance} blocks!"
