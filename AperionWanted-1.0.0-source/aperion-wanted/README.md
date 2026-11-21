@@ -41,9 +41,11 @@ Player records are stored in `plugins/AperionWanted/wanted.sqlite`.
 ## Current implementation notes
 
 - PvP kills add Wanted score and streak bonuses; death resets the victim's streak.
-- Proximity alerts use a title, chat warning and Elder Guardian sound. A live 3D player head is not embedded in the title.
+- Proximity alerts notify both the hunter and the wanted target using titles, chat warnings and the Elder Guardian sound. A live 3D player head is not embedded in the title.
+- Wanted players receive a rank tag in the Tab List; normal players keep their clean name. No bounty amount or reward item is shown beside the name.
+- Bounty claims select one random item from the target rank's configurable reward pool. Higher ranks can reward Ancient Debris, Netherite items and rare gear.
 - Tracking is temporary, same-world, range-limited and can require line of sight; no coordinates are shown.
-- Bounty rewards are vanilla items, not Vault currency.
+- Bounty rewards are randomized vanilla items, not Vault currency. Reward pools are configurable by rank.
 - Repeat bounty claims are limited by a configurable killer/target pair cooldown.
 - BetterTeams team detection is not implemented in this version; its config flag is reserved for a future adapter.
 - Player-funded bounty placement and offline target administration are not included.
