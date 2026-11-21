@@ -5,7 +5,6 @@ on:
     paths:
       - "AperionWanted-1.0.0-source/aperion-wanted/**"
       - ".github/workflows/build-aperion-wanted.yml"
-  push_tags:
     tags:
       - "v*"
   workflow_dispatch:
