@@ -31,10 +31,11 @@ It is designed for **APERION SMP** and aims to work for Java and Bedrock players
 | Wanted ranks | Six configurable ranks, from **Unknown** to **Most Wanted** |
 | Kill statistics | Stores total PvP kills, Wanted score and current streak |
 | Streak bonus | Consecutive kills add extra Wanted score |
-| Proximity alerts | Nearby players receive a warning when a high-score target is close |
+| Two-way proximity alerts | Hunters are alerted when a wanted target is close; the wanted player is also warned when another player enters their radius |
 | Elder Guardian-style warning | Title, chat warning and Elder Guardian sound |
 | Temporary tracking | Compass tracking for a limited time, in the same world and within range |
-| Bounty rewards | Configurable vanilla-item rewards based on the target's rank |
+| Rank-based loot | One randomized vanilla-item reward from the target's rank pool; higher ranks unlock Ancient Debris, Netherite loot and rare items |
+| Tab List rank tags | Wanted players show a rank tag beside their name; no reward amount is displayed |
 | Anti-farming | A configurable cooldown for repeat claims by the same killer/target pair |
 | Persistent data | SQLite database keyed by player UUID |
 | Bedrock support | Core server-side mechanics also apply to Bedrock players joining through Geyser |
@@ -129,11 +130,13 @@ bounty:
   same-pair-cooldown-hours: 24
 ```
 
-The full generated configuration includes rank thresholds, alert text and sound, item rewards, and the custom bounty item material. Change settings carefully and keep a backup of your config.
+The full generated configuration includes rank thresholds, Tab List formatting, separate hunter/target alert text, detection radius and cooldown, and randomized reward pools for each rank. Normal players keep a clean Tab List name; wanted players show only their rank, never a reward amount. Change settings carefully and keep a backup of your config.
 
 ## Important behaviour and current limitations
 
-- The alert currently uses a title, chat message and Elder Guardian sound. A normal title/chat notification cannot show a live 3D player head; this version does not display a player-head icon.
+- Proximity alerts notify both the nearby hunter and the wanted target with a title, chat message and Elder Guardian sound. A normal title/chat notification cannot show a live 3D player head; this version does not display a player-head icon.
+- The Tab List adds a wanted-rank tag beside wanted players' names. It does not show bounty amounts or reward items.
+- A bounty claim selects one random item entry from the target's rank reward pool. The reward pools are configurable; the highest ranks can include Ancient Debris, Netherite items, Elytra, Mace and other rare loot.
 - Tracking is temporary, same-world, range-limited and can require line of sight. It does not reveal target coordinates.
 - Bounties are paid as vanilla items; there is no built-in Vault/economy currency integration in this version.
 - The repeat-claim cooldown applies to the same killer/target pair. The BetterTeams option is reserved for a future integration; this version does not read BetterTeams team membership.
@@ -159,7 +162,9 @@ The shaded JAR is generated in `build/libs/`.
 - [ ] Plugin loads without errors on a staging Paper 26.3 server.
 - [ ] Two Java test players can generate and receive PvP kill statistics.
 - [ ] Kill streak increases Wanted score; death resets the streak.
-- [ ] High-Wanted proximity alert triggers within the configured radius.
+- [ ] Hunter and wanted-target proximity warnings both trigger within the configured radius.
+- [ ] Wanted rank tags appear in the Tab List, while normal player names remain unchanged.
+- [ ] Rank reward pools give a randomized reward appropriate to the target's rank.
 - [ ] Tracking expires, stops at range/dimension boundaries and respects line of sight.
 - [ ] Rank and extra bounty items are paid correctly.
 - [ ] Same killer/target pair cannot repeatedly claim before the cooldown expires.
