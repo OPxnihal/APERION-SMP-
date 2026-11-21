@@ -10,6 +10,16 @@ system:
   alert-subtitle: "&cA dangerous player is nearby: &f{player}"
   alert-chat: "&c⚠ &4MOST WANTED DETECTED &c⚠ &f{player} &7is within {distance} blocks!"
   alert-sound: ENTITY_ELDER_GUARDIAN_CURSE
+  # Also alert the wanted player when another player enters their radius.
+  target-alert-title: "&cBOUNTY HUNTER NEARBY"
+  target-alert-subtitle: "&eA player has entered your detection range."
+  target-alert-chat: "&cWARNING: &eA bounty hunter is nearby!"
+
+tab-list:
+  enabled: true
+  # Normal players keep a clean name. Wanted players get their rank only; no reward amount is shown.
+  normal-format: "&f{player}"
+  wanted-format: "&c⚠ &f{player} &8[&c{rank}&8]"
 
 wanted:
   kill-score: 25
@@ -33,14 +43,37 @@ tracking:
   expired-message: "&7Your wanted-player tracking has expired or lost line of sight."
 
 bounty:
-  # Rewards are delivered as vanilla items; no economy plugin is required.
+  # One random item entry is selected from the target's rank pool when a bounty is claimed.
+  # Format: MATERIAL:min-max (the amount range is optional).
+  # Higher wanted ranks unlock progressively rarer and stronger loot.
   rewards:
-    Unknown: "GOLD_INGOT:2"
-    Notorious: "GOLD_INGOT:5"
-    Wanted: "GOLD_INGOT:10"
-    Dangerous: "GOLD_INGOT:20"
-    Outlaw: "GOLD_INGOT:32"
-    Most Wanted: "GOLD_INGOT:48"
+    Unknown: []
+    Notorious:
+      - IRON_INGOT:4-8
+      - GOLD_INGOT:3-6
+      - EXPERIENCE_BOTTLE:8-16
+    Wanted:
+      - DIAMOND:2-4
+      - EMERALD:4-8
+      - GOLDEN_APPLE:1-2
+      - EXPERIENCE_BOTTLE:16-24
+    Dangerous:
+      - DIAMOND_BLOCK:1-2
+      - ENCHANTED_GOLDEN_APPLE:1
+      - TOTEM_OF_UNDYING:1
+      - NETHERITE_SCRAP:2-4
+    Outlaw:
+      - ANCIENT_DEBRIS:2-4
+      - NETHERITE_INGOT:1-2
+      - TOTEM_OF_UNDYING:1-2
+      - NETHERITE_UPGRADE_SMITHING_TEMPLATE:1
+    Most Wanted:
+      - ANCIENT_DEBRIS:4-8
+      - NETHERITE_INGOT:2-4
+      - ELYTRA:1
+      - MACE:1
+      - NETHERITE_UPGRADE_SMITHING_TEMPLATE:1
+      - ENCHANTED_GOLDEN_APPLE:2-4
   same-pair-cooldown-hours: 24
   # Prevent farming between players on the same BetterTeams team only if an integration is added later.
   block-same-team: false
